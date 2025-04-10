@@ -16,14 +16,17 @@ def find_text(
     text: str = Query(..., description="Украї́на (МФА: [ʊkrɐˈjinɐ]ⓘ) — держава у Східній та")
 ):
     response = requests.get(url)
-    if response.status_code == 200:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+    if response.status_code != 200:
+        raise HTTPException(status_code=400, detail="Не вдалося завантажити сторінку")
 
     soup = BeautifulSoup(response.text, "html.parser")
     elements = soup.find_all(tag)
 
     for element in elements:
-        if re.search(text, element.get_text()):
-            return {"found": element.get_text(strip=True)}
+      if re.search(text, element.get_text()):
+        return {"found": element.get_text(strip=True)}
 
     raise HTTPException(status_code=404, detail="Текст не знайдено")
+
+
+
